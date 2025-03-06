@@ -5,9 +5,13 @@
 #include <vector>
 #include <stdint.h>
 
-class Module; // Forward declaration
+#define DUMMY_GATE_ID (uint8_t)-1
+
+class Module;
 
 class Gate {
+
+protected:
 	uint8_t id;
 	uint8_t state;
 
@@ -19,17 +23,18 @@ class Gate {
 	// does this gate consume.
 	std::vector<int> numConnectedHeads;
 
-public:
-
 	// Track the two inbound connections. Even indices i
 	// indicate wire addresses, and i+1 indicates the wire's
 	// value as of the last read.
-	uint8_t inputs[4];
+	std::vector<std::pair<uint8_t, uint8_t>> inputs;
 
+public:
 	Gate(uint8_t);
+	virtual ~Gate() = default;
 
-	uint8_t computeState(void);
-	void updateInput(uint8_t, uint8_t, uint8_t);
+	virtual uint8_t computeState(void) = 0;
+
+	virtual void updateInput(uint8_t, uint8_t, uint8_t);
 	static void updateState(std::queue<Gate *>&);
 	
 	// Make Module a friend class so it can access connections and state
